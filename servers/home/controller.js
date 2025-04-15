@@ -71,6 +71,9 @@ export async function main(ns) {
   ns.print(`${target.hostname} is now prepped, killing any leftover hwg scripts to not desync timings`)
   let servers = getServers(ns);
   for (let server of servers) {
+    ns.scriptKill('/weak.js', server.hostname);
+    ns.scriptKill('/grow.js', server.hostname);
+    ns.scriptKill('/hack.js', server.hostname);
     ns.scriptKill('/batching/hk.js', server.hostname);
     ns.scriptKill('/batching/gr.js', server.hostname);
     ns.scriptKill('/batching/wk.js', server.hostname);
