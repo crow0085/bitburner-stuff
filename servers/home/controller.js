@@ -105,12 +105,12 @@ export async function main(ns) {
     const amount = target.maxMoney * greed;
     const hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target.hostname, amount)), 1);
     const tGreed = hPercent * hackThreads;
-    const growThreads = Math.ceil(ns.growthAnalyze(target.hostname, target.maxMoney / (target.maxMoney - target.maxMoney * tGreed)) * 1.01);
+    const growThreads = Math.ceil(ns.growthAnalyze(target.hostname, target.maxMoney / (target.maxMoney - target.maxMoney * tGreed)) * 1.02);
     const weakThreads1 = Math.max(Math.ceil(hackThreads * 0.002 / 0.05), 1);
     const weakThreads2 = Math.max(Math.ceil(hackThreads * 0.004 / 0.05), 1);
 
     let currentTime = performance.now();
-    let nextLanding = target.weakenTime + currentTime;
+    let nextLanding = target.weakenTime + currentTime + 50;
 
     let nextBatch = [];
 
@@ -146,7 +146,7 @@ export async function main(ns) {
           attacker: server.hostname,
           filename: '/batching/wk.js',
           threads: proposedBatch.wk,
-          landing: nextLanding + 5,
+          landing: nextLanding + 10,
           runtime: 4 * ns.getHackTime(target.hostname)
         });
         ram -= proposedBatch.wk * weakRamCost;
@@ -158,7 +158,7 @@ export async function main(ns) {
           attacker: server.hostname,
           filename: '/batching/gr.js',
           threads: proposedBatch.gr,
-          landing: nextLanding + 10,
+          landing: nextLanding + 20,
           runtime: 3.2 * ns.getHackTime(target.hostname)
         });
         ram -= proposedBatch.gr * growRamCost;
@@ -170,7 +170,7 @@ export async function main(ns) {
           attacker: server.hostname,
           filename: '/batching/wk.js',
           threads: proposedBatch.wk2,
-          landing: nextLanding + 15,
+          landing: nextLanding + 40,
           runtime: 4 * ns.getHackTime(target.hostname)
         });
         proposedBatch.wk2 = 0;
