@@ -49,6 +49,7 @@ export default class CustomServer {
   }
   get requiredHackingSkill() { return this.ns.getServerRequiredHackingLevel(this.hostname) }
   get hackDifficulty() { return this.minSecurity }
+  get cores () { return  this.ns.getServer(this.hostname).cpuCores }
 
  
 }

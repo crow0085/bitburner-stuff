@@ -27,8 +27,10 @@ export async function main(ns) {
   while (!target.isPrepped) {
 
     let servers = getServers(ns);
+    await ns.sleep(50);
 
-    let growThreads = Math.ceil(ns.growthAnalyze(target.hostname, target.maxMoney / target.currentMoney));
+    let cores = home.cores;
+    let growThreads = Math.ceil(ns.growthAnalyze(target.hostname, target.maxMoney / target.currentMoney, cores));
     let weakThreads1 = Math.ceil((target.currentSecurity - target.minSecurity) * 20);
     let weakThreads2 = Math.ceil(growThreads / 12.5);
 
@@ -67,9 +69,9 @@ export async function main(ns) {
   ns.print(`${target.hostname} is now prepped, killing any leftover hwg scripts to not desync timings`)
   let servers = getServers(ns);
   for (let server of servers) {
-    ns.scriptKill('hack.js', server.hostname);
-    ns.scriptKill('weak.js', server.hostname);
-    ns.scriptKill('grow.js', server.hostname);
+    ns.scriptKill('/batching/hk.js', server.hostname);
+    ns.scriptKill('/batching/gr.js', server.hostname);
+    ns.scriptKill('/batching/wk.js', server.hostname);
   }
 
   await ns.sleep(1000);
@@ -85,7 +87,7 @@ export async function main(ns) {
     // threads for each hwgw
     let hackThreads = Math.ceil(ns.hackAnalyzeThreads(target.hostname, target.maxMoney * hackThresh))
     let weakThreads1 = Math.ceil(hackThreads / 25);
-    let percentH = 1/(1- Math.min( ns.hackAnalyze(target.hostname) * hackThreads, 0.25))
+    let percentH = 1/(1- Math.min( ns.hackAnalyze(target.hostname) * hackThreads, 0.99))
     let growThreads = Math.ceil(ns.growthAnalyze(target.hostname, percentH))
     //growThreads += 10; // pad the growth in case of desync
     let weakThreads2 = Math.ceil(growThreads / 12);
@@ -113,9 +115,10 @@ export async function main(ns) {
       if (proposedBatch.hk > 0 && ram > proposedBatch.hk * hackRamCost) {
         nextBatch.push({
           attacker: server.hostname,
-          filename: 'hack.js',
+          filename: '/batching/hk.js',
           threads: proposedBatch.hk,
-          landing: nextLanding
+          landing: nextLanding,
+          runtime: 1 * ns.getHackTime(target.hostname)
         });
         ram -= proposedBatch.hk * hackRamCost;
         proposedBatch.hk = 0;
@@ -124,9 +127,10 @@ export async function main(ns) {
       if (proposedBatch.wk > 0 && ram > proposedBatch.wk * weakRamCost) {
         nextBatch.push({
           attacker: server.hostname,
-          filename: 'weak.js',
+          filename: '/batching/wk.js',
           threads: proposedBatch.wk,
-          landing: nextLanding + 20
+          landing: nextLanding + 20,
+          runtime: 4 * ns.getHackTime(target.hostname)
         });
         ram -= proposedBatch.wk * weakRamCost;
         proposedBatch.wk = 0;
@@ -135,9 +139,10 @@ export async function main(ns) {
       if (proposedBatch.gr > 0 && ram > proposedBatch.gr * growRamCost) {
         nextBatch.push({
           attacker: server.hostname,
-          filename: 'grow.js',
+          filename: '/batching/gr.js',
           threads: proposedBatch.gr,
-          landing: nextLanding + 40
+          landing: nextLanding + 40,
+          runtime: 3.2 * ns.getHackTime(target.hostname)
         });
         ram -= proposedBatch.gr * growRamCost;
         proposedBatch.gr = 0;
@@ -146,9 +151,10 @@ export async function main(ns) {
       if (proposedBatch.wk2 > 0 && ram > proposedBatch.wk2 * weakRamCost) {
         nextBatch.push({
           attacker: server.hostname,
-          filename: 'weak.js',
+          filename: '/batching/wk.js',
           threads: proposedBatch.wk2,
-          landing: nextLanding + 60
+          landing: nextLanding + 60,
+          runtime: 4 * ns.getHackTime(target.hostname)
         });
         proposedBatch.wk2 = 0;
       }
@@ -160,7 +166,7 @@ export async function main(ns) {
       //ns.print(nextBatch)
       for (let cmd of nextBatch) {
         //ns.tprint(`executing command ${cmd.filename} from ${cmd.attacker} hitting server ${target.hostname}`)
-        pids.push(ns.exec(cmd.filename, cmd.attacker, cmd.threads, target.hostname, false, cmd.landing))
+        pids.push(ns.exec(cmd.filename, cmd.attacker, cmd.threads, target.hostname, cmd.landing, cmd.runtime))
       }
 
       const allRunning = pids.filter(p => p > 0).length == 4 ? true : false
@@ -170,9 +176,9 @@ export async function main(ns) {
       }
     }
 
+    
 
-
-    await ns.sleep(0)
+    await ns.sleep(50)
   }
 }
 
@@ -186,9 +192,9 @@ function getServers(ns) {
 
   for (let server of slist) {
     utils.nukeServer(ns, server);
-    ns.scp('weak.js', server);
-    ns.scp('grow.js', server);
-    ns.scp('hack.js', server);
+    ns.scp('/batching/hk.js', server);
+    ns.scp('/batching/gr.js', server);
+    ns.scp('/batching/wk.js', server);
   }
 
   let servers = [];

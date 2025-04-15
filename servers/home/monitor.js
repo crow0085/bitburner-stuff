@@ -6,7 +6,7 @@ export async function main(ns) {
   const file = 'target.txt'
 
 
-  ns.ui.openTail();
+  ns.ui.renderTail();
   ns.disableLog('ALL');
   while (true) {
     ns.clearLog();
@@ -17,7 +17,7 @@ export async function main(ns) {
       ns.print(`server prepped: ${so.isPrepped}`);
       ns.print(`Money: ${ns.formatNumber(so.currentMoney)} / ${ns.formatNumber(so.maxMoney)} (${ns.formatPercent(so.currentMoney / so.maxMoney)})`);
       ns.print(`Time to hack: ${ns.tFormat(so.hackTime)} t=${Math.ceil(ns.hackAnalyzeThreads(so.hostname, so.currentMoney))}`);
-      ns.print(`Time to grow: ${ns.tFormat(so.growTime)} t=${Math.ceil(ns.growthAnalyze(so.hostname, so.maxMoney / so.currentMoney))}`);
+      ns.print(`Time to grow: ${ns.tFormat(so.growTime)} t=${Math.ceil(ns.growthAnalyze(so.hostname, so.maxMoney / so.currentMoney, new CustomServer(ns, 'home').cores))}`);
       ns.print(`Time to weaken: ${ns.tFormat(so.weakenTime)} t=${Math.ceil((so.currentSecurity - so.minSecurity) * 20)}`);
       ns.print(`Current security: ${so.currentSecurity}`);
       ns.print(`Minimum security: ${so.minSecurity}`);
