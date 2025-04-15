@@ -24,7 +24,7 @@ export async function main(ns) {
         money: `${ns.formatNumber(server.currentMoney)} / ${ns.formatNumber(server.maxMoney)} (${ns.formatPercent(server.currentMoney / server.maxMoney)})`,
         security: `${server.minSecurity} (${ns.formatPercent(server.hackChance)})`,
         hack: `t=${Math.ceil(ns.hackAnalyzeThreads(server.hostname, server.currentMoney))}`,
-        grow: `t=${Math.ceil(ns.growthAnalyze(server.hostname, server.maxMoney / server.currentMoney, new CustomServer(ns, 'home').cores))}`,
+        grow: `t=${Math.ceil(ns.growthAnalyze(server.hostname, server.maxMoney / Math.max(server.currentMoney, 1), new CustomServer(ns, 'home').cores))}`,
         weak: `t=${Math.ceil((server.currentSecurity - server.minSecurity) * 20)}`,
         isTarget: server.hostname == target ? true : false
 

@@ -19,7 +19,7 @@ export async function main(ns) {
   let weakRamCost = ns.getScriptRam('weak.js');
   let hackRamCost = ns.getScriptRam('hack.js')
 
-  let target = getTarget(ns);
+  let target = new CustomServer(ns, 'omega-net') // getTarget(ns);
   let file = 'target.txt';
   ns.write(file, target.hostname, 'w');
   ns.print(`Found a new target: ${target.hostname}`);
@@ -91,7 +91,7 @@ export async function main(ns) {
     let weakThreads1 = Math.ceil(hackThreads / 25);
     let percentH = 1 / (1 - ns.hackAnalyze(target.hostname) * hackThreads);
 
-    let growThreads = Math.ceil(ns.growthAnalyze(target.hostname, percentH))
+    let growThreads = Math.ceil(ns.growthAnalyze(target.hostname, Math.max(percentH, 1)));
     let weakThreads2 = Math.ceil(growThreads / 12);
 
     let currentTime = performance.now();
