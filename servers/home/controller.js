@@ -87,7 +87,7 @@ export async function main(ns) {
     servers.sort((a, b) => a.isHome - b.isHome);
 
     // start batching hwgw
-    let hackThresh = 0.1;
+    let hackThresh = 0.2;
 
     // threads for each hwgw
     let hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target.hostname, target.maxMoney * hackThresh)), 1)
@@ -133,7 +133,7 @@ export async function main(ns) {
           attacker: server.hostname,
           filename: '/batching/wk.js',
           threads: proposedBatch.wk,
-          landing: nextLanding + 20,
+          landing: nextLanding + 40,
           runtime: 4 * ns.getHackTime(target.hostname)
         });
         ram -= proposedBatch.wk * weakRamCost;
@@ -145,7 +145,7 @@ export async function main(ns) {
           attacker: server.hostname,
           filename: '/batching/gr.js',
           threads: proposedBatch.gr,
-          landing: nextLanding + 40,
+          landing: nextLanding + 80,
           runtime: 3.2 * ns.getHackTime(target.hostname)
         });
         ram -= proposedBatch.gr * growRamCost;
@@ -157,7 +157,7 @@ export async function main(ns) {
           attacker: server.hostname,
           filename: '/batching/wk.js',
           threads: proposedBatch.wk2,
-          landing: nextLanding + 60,
+          landing: nextLanding + 120,
           runtime: 4 * ns.getHackTime(target.hostname)
         });
         proposedBatch.wk2 = 0;
@@ -182,7 +182,7 @@ export async function main(ns) {
 
     
 
-    await ns.sleep(50)
+    await ns.sleep()
   }
 }
 

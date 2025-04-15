@@ -1,4 +1,4 @@
-const HOME_RESERVED_RAM = 0;
+const HOME_RESERVED_RAM = 30;
 
 /** @param {NS} ns **/
 export default class CustomServer {

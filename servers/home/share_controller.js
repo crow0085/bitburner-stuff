@@ -5,7 +5,7 @@ import * as utils from './utils.js';
 export async function main(ns) {
 
     const ramCost = ns.getScriptRam('/share.js');
-    const SHARE_PERCENT = 0; // percentage of max threads to share
+    const SHARE_PERCENT = .5; // percentage of max threads to share
     const slist = utils.netscan(ns);
     let servers = [];
     for (let s of slist) {
