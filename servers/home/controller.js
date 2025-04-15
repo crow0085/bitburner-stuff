@@ -182,7 +182,7 @@ export async function main(ns) {
 
     
 
-    await ns.sleep()
+    await ns.sleep(0)
   }
 }
 
