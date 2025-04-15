@@ -113,7 +113,7 @@ export async function main(_ns: NS) {
   ns = _ns;
   ns.ui.openTail();
   ns.ui.resizeTail(931, 281);
-  ns.ui.moveTail(1615,16);
+  ns.ui.moveTail(1612,16);
   ns.ui.setTailTitle('Dashboard Monitor');
   ns.clearLog();
   ns.disableLog('ALL');
