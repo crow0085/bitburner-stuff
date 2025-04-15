@@ -138,5 +138,5 @@ mirror/
 build/
 
 .vscode/*
-#!.vscode/launch.json
+!.vscode/launch.json
 
