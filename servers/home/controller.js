@@ -191,6 +191,9 @@ function getServers(ns) {
 
   for (let server of slist) {
     utils.nukeServer(ns, server);
+    ns.scp('/weak.js', server);
+    ns.scp('/grow.js', server);
+    ns.scp('/hack.js', server);
     ns.scp('/batching/hk.js', server);
     ns.scp('/batching/gr.js', server);
     ns.scp('/batching/wk.js', server);
