@@ -19,7 +19,7 @@ export async function main(ns) {
   let weakRamCost = ns.getScriptRam('weak.js');
   let hackRamCost = ns.getScriptRam('hack.js')
 
-  let target = new CustomServer(ns, 'omega-net') // getTarget(ns);
+  let target = getTarget(ns);
   let file = 'target.txt';
   ns.write(file, target.hostname, 'w');
   ns.print(`Found a new target: ${target.hostname}`);
