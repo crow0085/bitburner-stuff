@@ -12,8 +12,9 @@ export async function main(ns) {
     }
 
     recursiveScan(ns, '', 'home', server, route);
-
-    ns.tprint("connect ", route.join("; connect ") + ';backdoor')
+    const conString = ("connect ", route.join("; connect ") + ';backdoor')
+    ns.tprint(conString)
+    navigator.clipboard.writeText(conString)
 }
 
 /** @param {NS} ns */
