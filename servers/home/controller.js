@@ -89,8 +89,7 @@ export async function main(ns) {
     // threads for each hwgw
     let hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target.hostname, target.maxMoney * hackThresh)), 1)
     let weakThreads1 = Math.ceil(hackThreads / 25);
-    let percentH = 1 / (1 - ns.hackAnalyze(target.hostname) * hackThreads);
-
+    let percentH = 1 / (1 - Math.max((ns.hackAnalyze(target.hostname) * hackThreads), ns.hackAnalyze(target.hostname)))
     let growThreads = Math.ceil(ns.growthAnalyze(target.hostname, Math.max(percentH, 1)));
     let weakThreads2 = Math.ceil(growThreads / 12);
 
