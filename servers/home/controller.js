@@ -40,23 +40,23 @@ export async function main(ns) {
 
     if (home.freeRam >= (growThreads * growRamCost) + (weakThreads1 * weakRamCost) + (weakThreads2 * weakRamCost)) {
       if (growThreads > 0)
-        ns.exec('/batching/gr.js', home.hostname, growThreads, target.hostname);
+        ns.exec('grow.js', home.hostname, growThreads, target.hostname);
       if (weakThreads1 > 0)
-        ns.exec('/batching/wk.js', home.hostname, weakThreads1, target.hostname);
+        ns.exec('weak.js', home.hostname, weakThreads1, target.hostname);
       if (weakThreads2 > 0)
-        ns.exec('/batching/wk.js', home.hostname, weakThreads2, target.hostname);
+        ns.exec('weak.js', home.hostname, weakThreads2, target.hostname);
       delay = target.weakenTime;
     }
     else {
       for (let server of servers) {
         if (weakThreads1 > 0 && server.threadCount(weakRamCost) > 0) {
-          ns.exec('/batching/wk.js', server.hostname, Math.min(weakThreads1, server.threadCount(weakRamCost)), target.hostname);
+          ns.exec('weak.js', server.hostname, Math.min(weakThreads1, server.threadCount(weakRamCost)), target.hostname);
           delay = target.weakenTime;
         } else if (growThreads > 0 && server.threadCount(growRamCost) > 0) {
-          ns.exec('/batching/gr.js', server.hostname, Math.min(growThreads, server.threadCount(growRamCost)), target.hostname);
+          ns.exec('grow.js', server.hostname, Math.min(growThreads, server.threadCount(growRamCost)), target.hostname);
           delay = target.growTime;
         } else if (weakThreads2 > 0 && server.threadCount(weakRamCost) > 0) {
-          ns.exec('/batching/wk.js', server.hostname, Math.min(weakThreads2, server.threadCount(weakRamCost)), target.hostname);
+          ns.exec('weak.js', server.hostname, Math.min(weakThreads2, server.threadCount(weakRamCost)), target.hostname);
           delay = target.weakenTime;
         }
       }
