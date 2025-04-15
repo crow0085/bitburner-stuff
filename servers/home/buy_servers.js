@@ -1,4 +1,5 @@
 import CustomServer from "./server";
+const UPGRADE_DELAY = 60;
 
 /** @param {NS} ns */
 export async function main(ns) {
@@ -41,6 +42,6 @@ export async function main(ns) {
         }
       }
     }
-    await ns.sleep(5000);
+    await ns.sleep(UPGRADE_DELAY * 1000);
   }
 }

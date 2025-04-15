@@ -110,7 +110,7 @@ export async function main(ns) {
     const weakThreads2 = Math.max(Math.ceil(hackThreads * 0.004 / 0.05), 1);
 
     let currentTime = performance.now();
-    let nextLanding = target.weakenTime + 50 + currentTime;
+    let nextLanding = target.weakenTime + currentTime;
 
     let nextBatch = [];
 
