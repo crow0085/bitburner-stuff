@@ -13,7 +13,13 @@ export async function main(ns) {
   while (true) {
     ns.clearLog();
     if (ns.fileExists(file, 'home')) {
-      const server = ns.read(file);
+      let server = '';
+      if (ns.args[0]){
+        server = ns.args[0]
+      } else{
+        server = ns.read(file);
+      }
+      
       const so = new CustomServer(ns, server);
       ns.print(`Server: ${so.hostname}`);
       ns.print(`server prepped: ${so.isPrepped}`);

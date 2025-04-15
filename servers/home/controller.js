@@ -84,14 +84,14 @@ export async function main(ns) {
     servers.sort((a, b) => a.isHome - b.isHome);
 
     // start batching hwgw
-    let hackThresh = 0.1;
+    let hackThresh = 0.4;
 
     // threads for each hwgw
-    let hackThreads = Math.ceil(ns.hackAnalyzeThreads(target.hostname, target.maxMoney * hackThresh))
+    let hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target.hostname, target.maxMoney * hackThresh)), 1)
     let weakThreads1 = Math.ceil(hackThreads / 25);
-    let percentH = 1/(1- Math.min( ns.hackAnalyze(target.hostname) * hackThreads, 0.99))
+    let percentH = 1 / (1 - ns.hackAnalyze(target.hostname) * hackThreads);
+
     let growThreads = Math.ceil(ns.growthAnalyze(target.hostname, percentH))
-    //growThreads += 10; // pad the growth in case of desync
     let weakThreads2 = Math.ceil(growThreads / 12);
 
     let currentTime = performance.now();
@@ -183,8 +183,6 @@ export async function main(ns) {
     await ns.sleep(50)
   }
 }
-
-
 
 /** 
  * @param {NS} ns 
