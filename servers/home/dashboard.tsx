@@ -111,7 +111,9 @@ const TableComponent = () => {
 
 export async function main(_ns: NS) {
   ns = _ns;
-  ns.ui.renderTail();
+  ns.ui.openTail();
+  ns.ui.resizeTail(931, 281);
+  ns.ui.moveTail(1615,16);
   ns.ui.setTailTitle('Dashboard Monitor');
   ns.clearLog();
   ns.disableLog('ALL');

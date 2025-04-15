@@ -8,6 +8,8 @@ import * as utils from './utils.js';
 export async function main(ns) {
 
   ns.ui.openTail();
+  ns.ui.resizeTail(891, 155);
+  ns.ui.moveTail(1659,316);
   ns.disableLog('ALL');
   ns.clearLog();
 

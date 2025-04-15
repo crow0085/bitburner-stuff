@@ -6,7 +6,9 @@ export async function main(ns) {
   const file = 'target.txt'
 
 
-  ns.ui.renderTail();
+  ns.ui.openTail();
+  ns.ui.resizeTail(422, 281);
+  ns.ui.moveTail(2122,486);
   ns.disableLog('ALL');
   while (true) {
     ns.clearLog();
