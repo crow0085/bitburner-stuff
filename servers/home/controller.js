@@ -84,7 +84,7 @@ export async function main(ns) {
     servers.sort((a, b) => a.isHome - b.isHome);
 
     // start batching hwgw
-    let hackThresh = 0.4;
+    let hackThresh = 0.1;
 
     // threads for each hwgw
     let hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target.hostname, target.maxMoney * hackThresh)), 1)
