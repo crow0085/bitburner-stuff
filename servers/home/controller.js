@@ -87,7 +87,7 @@ export async function main(ns) {
     servers.sort((a, b) => a.isHome - b.isHome);
 
     // start batching hwgw
-    let greed = 0.05;
+    let greed = 0.01;
 
     // threads for each hwgw
     // let hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target.hostname, target.maxMoney * hackThresh)), 1)
@@ -100,102 +100,103 @@ export async function main(ns) {
     // growThreads += Math.ceil(growThreads * 0.25);
     // let weakThreads2 = Math.ceil(growThreads / 12);
 
+    const batchSzie = 40000;
+    for (let i = 0; i < batchSzie; i++) {
+      const hPercent = ns.hackAnalyze(target.hostname);
+      const amount = target.maxMoney * greed;
+      const hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target.hostname, amount)), 1);
+      const tGreed = hPercent * hackThreads;
+      const growThreads = Math.ceil(ns.growthAnalyze(target.hostname, target.maxMoney / (target.maxMoney - target.maxMoney * tGreed)) * 1.02);
+      const weakThreads1 = Math.max(Math.ceil(hackThreads * 0.002 / 0.05), 1);
+      const weakThreads2 = Math.max(Math.ceil(hackThreads * 0.004 / 0.05), 1);
 
-    const hPercent = ns.hackAnalyze(target.hostname);
-    const amount = target.maxMoney * greed;
-    const hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target.hostname, amount)), 1);
-    const tGreed = hPercent * hackThreads;
-    const growThreads = Math.ceil(ns.growthAnalyze(target.hostname, target.maxMoney / (target.maxMoney - target.maxMoney * tGreed)) * 1.02);
-    const weakThreads1 = Math.max(Math.ceil(hackThreads * 0.002 / 0.05), 1);
-    const weakThreads2 = Math.max(Math.ceil(hackThreads * 0.004 / 0.05), 1);
+      let currentTime = performance.now();
+      let nextLanding = target.weakenTime + currentTime + 5000;
 
-    let currentTime = performance.now();
-    let nextLanding = target.weakenTime + currentTime + 50;
+      let nextBatch = [];
 
-    let nextBatch = [];
+      let proposedBatch = {
+        hk: hackThreads,
+        wk: weakThreads1,
+        gr: growThreads,
+        wk2: weakThreads2
+      };
 
-    let proposedBatch = {
-      hk: hackThreads,
-      wk: weakThreads1,
-      gr: growThreads,
-      wk2: weakThreads2
-    };
+      //ns.print(proposedBatch)
 
-    //ns.print(proposedBatch)
+      for (let server of servers) {
+        if (nextBatch.length == 4)
+          break;
 
-    for (let server of servers) {
-      if (nextBatch.length == 4)
-        break;
+        let ram = server.freeRam;
 
-      let ram = server.freeRam;
+        if (proposedBatch.hk > 0 && ram > proposedBatch.hk * hackRamCost) {
+          nextBatch.push({
+            attacker: server.hostname,
+            filename: '/batching/hk.js',
+            threads: proposedBatch.hk,
+            landing: nextLanding,
+            runtime: 1 * ns.getHackTime(target.hostname)
+          });
+          ram -= proposedBatch.hk * hackRamCost;
+          proposedBatch.hk = 0;
+        }
 
-      if (proposedBatch.hk > 0 && ram > proposedBatch.hk * hackRamCost) {
-        nextBatch.push({
-          attacker: server.hostname,
-          filename: '/batching/hk.js',
-          threads: proposedBatch.hk,
-          landing: nextLanding,
-          runtime: 1 * ns.getHackTime(target.hostname)
-        });
-        ram -= proposedBatch.hk * hackRamCost;
-        proposedBatch.hk = 0;
-      }
+        if (proposedBatch.wk > 0 && ram > proposedBatch.wk * weakRamCost) {
+          nextBatch.push({
+            attacker: server.hostname,
+            filename: '/batching/wk.js',
+            threads: proposedBatch.wk,
+            landing: nextLanding + 20,
+            runtime: 4 * ns.getHackTime(target.hostname)
+          });
+          ram -= proposedBatch.wk * weakRamCost;
+          proposedBatch.wk = 0;
+        }
 
-      if (proposedBatch.wk > 0 && ram > proposedBatch.wk * weakRamCost) {
-        nextBatch.push({
-          attacker: server.hostname,
-          filename: '/batching/wk.js',
-          threads: proposedBatch.wk,
-          landing: nextLanding + 10,
-          runtime: 4 * ns.getHackTime(target.hostname)
-        });
-        ram -= proposedBatch.wk * weakRamCost;
-        proposedBatch.wk = 0;
-      }
+        if (proposedBatch.gr > 0 && ram > proposedBatch.gr * growRamCost) {
+          nextBatch.push({
+            attacker: server.hostname,
+            filename: '/batching/gr.js',
+            threads: proposedBatch.gr,
+            landing: nextLanding + 40,
+            runtime: 3.2 * ns.getHackTime(target.hostname)
+          });
+          ram -= proposedBatch.gr * growRamCost;
+          proposedBatch.gr = 0;
+        }
 
-      if (proposedBatch.gr > 0 && ram > proposedBatch.gr * growRamCost) {
-        nextBatch.push({
-          attacker: server.hostname,
-          filename: '/batching/gr.js',
-          threads: proposedBatch.gr,
-          landing: nextLanding + 20,
-          runtime: 3.2 * ns.getHackTime(target.hostname)
-        });
-        ram -= proposedBatch.gr * growRamCost;
-        proposedBatch.gr = 0;
-      }
+        if (proposedBatch.wk2 > 0 && ram > proposedBatch.wk2 * weakRamCost) {
+          nextBatch.push({
+            attacker: server.hostname,
+            filename: '/batching/wk.js',
+            threads: proposedBatch.wk2,
+            landing: nextLanding + 60,
+            runtime: 4 * ns.getHackTime(target.hostname)
+          });
+          proposedBatch.wk2 = 0;
+        }
 
-      if (proposedBatch.wk2 > 0 && ram > proposedBatch.wk2 * weakRamCost) {
-        nextBatch.push({
-          attacker: server.hostname,
-          filename: '/batching/wk.js',
-          threads: proposedBatch.wk2,
-          landing: nextLanding + 40,
-          runtime: 4 * ns.getHackTime(target.hostname)
-        });
-        proposedBatch.wk2 = 0;
+        const pids = [];
+        if (nextBatch.length == 4) {
+          //ns.print(nextBatch)
+          for (let cmd of nextBatch) {
+            //ns.tprint(`executing command ${cmd.filename} from ${cmd.attacker} hitting server ${target.hostname}`)
+            pids.push(ns.exec(cmd.filename, cmd.attacker, cmd.threads, target.hostname, cmd.landing, cmd.runtime))
+          }
+
+          const allRunning = pids.filter(p => p > 0).length == 4 ? true : false
+          if (!allRunning) {
+            ns.alert(`Something happened and didnt return 4 pids so memory alloc failed`);
+            ns.exit();
+          }
+        }
       }
     }
 
-    const pids = [];
 
-    if (nextBatch.length == 4) {
-      //ns.print(nextBatch)
-      for (let cmd of nextBatch) {
-        //ns.tprint(`executing command ${cmd.filename} from ${cmd.attacker} hitting server ${target.hostname}`)
-        pids.push(ns.exec(cmd.filename, cmd.attacker, cmd.threads, target.hostname, cmd.landing, cmd.runtime))
-      }
-
-      const allRunning = pids.filter(p => p > 0).length == 4 ? true : false
-      if (!allRunning) {
-        ns.alert(`Something happened and didnt return 4 pids so memory alloc failed`);
-        ns.exit();
-      }
-    }
-
-
-
-    await ns.sleep(0)
+    await ns.sleep(0);
+    await ns.sleep(200)
   }
 }
 
