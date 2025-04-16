@@ -82,28 +82,21 @@ export async function main(ns) {
 
   await ns.sleep(1000);
   ns.print(`Ready to start firing batches on all available servers targetting: ${target.hostname}`)
+  let batchCount = 0;
 
   while (true) {
     let servers = getServers(ns);
     servers.sort((a, b) => a.isHome - b.isHome);
 
     // start batching hwgw
-    const greed = 0.05;
+    const greed = 0.1;
 
-    // threads for each hwgw
-    // let hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target.hostname, target.maxMoney * hackThresh)), 1)
-    // let hkAmnt = ns.hackAnalyze(target.hostname) * hackThreads
-    // ns.print(ns.formatNumber(hkAmnt))
-    // let weakThreads1 = Math.ceil(hackThreads / 25);
-    // //let percentH = 1 / (1 - Math.max((ns.hackAnalyze(target.hostname) * hackThreads), ns.hackAnalyze(target.hostname)))
-    // let percentH = 1 / (1 - (ns.hackAnalyze(target.hostname) * hackThreads))
-    // let growThreads = Math.ceil(ns.growthAnalyze(target.hostname, Math.max(percentH, 1)));
-    // growThreads += Math.ceil(growThreads * 0.25);
-    // let weakThreads2 = Math.ceil(growThreads / 12);
-
-    const batchSize = 20000;
-    const fpsSensitivityMs = 300;
-    let sleepWhen = performance.now() + fpsSensitivityMs
+    const batchSize = 5000;
+    const maxBatchCount = 80000 * 4;
+    
+    
+    let nextSleep = performance.now() + 400
+    
     for (let i = 0; i < batchSize; i++) {
       const hPercent = ns.hackAnalyze(target.hostname);
       const amount = target.maxMoney * greed;
@@ -185,22 +178,30 @@ export async function main(ns) {
           //ns.print(nextBatch)
           for (let cmd of nextBatch) {
             //ns.tprint(`executing command ${cmd.filename} from ${cmd.attacker} hitting server ${target.hostname}`)
-            pids.push(ns.exec(cmd.filename, cmd.attacker, cmd.threads, target.hostname, cmd.landing, cmd.runtime))
+            pids.push(ns.exec(cmd.filename, cmd.attacker, cmd.threads, target.hostname, cmd.landing, cmd.runtime))                  
           }
+
+          batchCount ++;   
+          ns.print(batchCount)   
 
           const allRunning = pids.filter(p => p > 0).length == 4 ? true : false
           if (!allRunning) {
             ns.alert(`Something happened and didnt return 4 pids so memory alloc failed`);
             ns.exit();
           }
+
+          if (batchCount == maxBatchCount){
+            await ns.sleep(target.weakenTime)
+            batchCount = 0;
+          }
         }
       }
-      if (performance.now() > sleepWhen) {
-        sleepWhen = performance.now() + fpsSensitivityMs;
+      if(performance.now() > nextSleep){
+        await ns.sleep(0)
+        nextSleep = performance.now() + 400
       }
     }
-    await ns.sleep(0);
-    await ns.sleep(200)
+    await ns.sleep(0)
   }
 }
 
