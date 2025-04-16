@@ -101,7 +101,7 @@ export async function main(ns) {
     // let weakThreads2 = Math.ceil(growThreads / 12);
 
     const batchSize = 40000;
-    for (let i = 0; i < batchSzie; i++) {
+    for (let i = 0; i < batchSize; i++) {
       const hPercent = ns.hackAnalyze(target.hostname);
       const amount = target.maxMoney * greed;
       const hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target.hostname, amount)), 1);
