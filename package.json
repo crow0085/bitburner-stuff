@@ -20,6 +20,10 @@
     "@types/react": "^18.3.4",
     "@types/react-dom": "^18.3.0",
     "esbuild": "^0.23.1",
-    "esbuild-bitburner-plugin": "^1.6.3"
+    "esbuild-bitburner-plugin": "^1.6.3",
+    "react-fps-stats": "^0.3.1"
+  },
+  "devDependencies": {
+    "@types/fps": "^0.0.2"
   }
 }

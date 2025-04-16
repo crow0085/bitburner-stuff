@@ -90,9 +90,9 @@ export async function main(ns) {
     // start batching hwgw
 
     const batchSize = 5000;
-    const maxBatchCount = 65000 * 4;
+    const maxBatchCount = 60000 * 4;
 
-    let nextSleep = performance.now() + 600
+    let nextSleep = performance.now() + 400
 
     for (let i = 0; i < batchSize; i++) {
       const hPercent = ns.hackAnalyze(target.hostname);
@@ -120,6 +120,13 @@ export async function main(ns) {
       for (let server of servers) {
         if (nextBatch.length == 4)
           break;
+
+        if (home.freeRam < growThreads * growRamCost){
+          greed -= 0.01;
+          greed = greed < 0.01 ? 0.01 : greed;
+          ns.print(`new greed: ${greed}`);
+          break;
+        } 
 
         let ram = server.freeRam;
 
@@ -191,22 +198,17 @@ export async function main(ns) {
             greed += 0.05;
             greed = greed > 0.95 ? 0.95 : greed;
             ns.print(`new greed: ${greed}`);
-            await ns.sleep(target.weakenTime + 80);
+            await ns.sleep(nextLanding - performance.now() + 500);
             break;
           }
         }
-      }
-      if (home.freeRam < growThreads * growRamCost){
-        greed -= 0.01;
-        greed = greed < 0.01 ? 0.01 : greed;
-        ns.print(`new greed: ${greed}`);
-      } 
+      }      
       if (performance.now() > nextSleep) {
         await ns.sleep(0)
-        nextSleep = performance.now() + 600
+        nextSleep = performance.now() + 400
       }
     }       
-    await ns.sleep(50)
+    await ns.sleep(0)
   }
 }
 
