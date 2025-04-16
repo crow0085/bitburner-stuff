@@ -88,7 +88,7 @@ export async function main(ns) {
     servers.sort((a, b) => a.isHome - b.isHome);
 
     // start batching hwgw
-    const greed = 0.01;
+    const greed = 0.05;
 
     // threads for each hwgw
     // let hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target.hostname, target.maxMoney * hackThresh)), 1)
@@ -101,7 +101,9 @@ export async function main(ns) {
     // growThreads += Math.ceil(growThreads * 0.25);
     // let weakThreads2 = Math.ceil(growThreads / 12);
 
-    const batchSize = 40000;
+    const batchSize = 20000;
+    const fpsSensitivityMs = 300;
+    let sleepWhen = performance.now() + fpsSensitivityMs
     for (let i = 0; i < batchSize; i++) {
       const hPercent = ns.hackAnalyze(target.hostname);
       const amount = target.maxMoney * greed;
@@ -193,11 +195,13 @@ export async function main(ns) {
           }
         }
       }
+      if (performance.now() > sleepWhen) {
+        ns.print(`sleeping`)
+        sleepWhen = performance.now() + fpsSensitivityMs;
+      }
     }
-
-
     await ns.sleep(0);
-    await ns.sleep(400)
+    await ns.sleep(200)
   }
 }
 
