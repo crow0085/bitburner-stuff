@@ -83,13 +83,14 @@ export async function main(ns) {
   await ns.sleep(1000);
   ns.print(`Ready to start firing batches on all available servers targetting: ${target.hostname}`)
   let batchCount = 0;
+  let greed = 0.05;
 
   while (true) {
     let servers = getServers(ns);
     servers.sort((a, b) => a.isHome - b.isHome);
 
     // start batching hwgw
-    let greed = 0.05;
+    
     const batchSize = 5000;
     const maxBatchCount = 80000 * 4;
     
@@ -189,10 +190,12 @@ export async function main(ns) {
           }
 
           if (batchCount == maxBatchCount){
-            await ns.sleep(target.weakenTime)
             batchCount = 0;
             greed += 0.05;
             greed = greed > 0.95 ? 0.95 : greed;
+            ns.print(greed);
+            await ns.sleep(target.weakenTime);
+            break;           
           }
         }
       }
