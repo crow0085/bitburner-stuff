@@ -89,8 +89,7 @@ export async function main(ns) {
     servers.sort((a, b) => a.isHome - b.isHome);
 
     // start batching hwgw
-    const greed = 0.1;
-
+    let greed = 0.05;
     const batchSize = 5000;
     const maxBatchCount = 80000 * 4;
     
@@ -182,7 +181,6 @@ export async function main(ns) {
           }
 
           batchCount ++;   
-          ns.print(batchCount)   
 
           const allRunning = pids.filter(p => p > 0).length == 4 ? true : false
           if (!allRunning) {
@@ -193,6 +191,8 @@ export async function main(ns) {
           if (batchCount == maxBatchCount){
             await ns.sleep(target.weakenTime)
             batchCount = 0;
+            greed += 0.05;
+            greed = greed > 0.95 ? 0.95 : greed;
           }
         }
       }
