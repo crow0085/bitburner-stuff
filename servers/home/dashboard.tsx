@@ -4,11 +4,14 @@ let ns: NS;
 
 const TableComponent = () => {
   const [data, setData] = useState<any[]>([]);
+  const [currentTarget, setCurrentTarget] = useState<string>('');
 
   useEffect(() => {
     const interval = setInterval(() => {
       const jsonData = JSON.parse(ns.read('server-data.txt'));
+      const currentTarget = ns.read('current-target.txt');
       setData(jsonData);
+      setCurrentTarget(currentTarget);
     }, 350); // Update every 350ms
 
     return () => clearInterval(interval); // Cleanup interval on component unmount
@@ -35,8 +38,8 @@ const TableComponent = () => {
                 style={{
                   border: '1px dotted red',
                   padding: '8px',
-                  color: item.isTarget ? 'green' : 'inherit', //Teal if isTarget is true 008080
-                  fontWeight: item.isTarget ? 'bold' : 'normal', // Optional: Make it bold for better visibility
+                  color: item.hostname === currentTarget ? 'teal' : item.isTarget ? 'green' : 'inherit', 
+                  fontWeight: item.hostname === currentTarget || item.isTarget ? 'bold' : 'normal', // Optional: Make it bold for better visibility
                 }}
               >
                 {item.hostname}

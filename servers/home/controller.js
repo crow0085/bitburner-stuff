@@ -20,6 +20,7 @@ export async function main(ns) {
   let hackRamCost = ns.getScriptRam('hack.js')
 
   let target = getTarget(ns);
+  ns.write('current-target.txt', target.hostname)
   let file = 'target.txt';
   ns.write(file, target.hostname, 'w');
   ns.print(`Found a new target: ${target.hostname}`);
@@ -196,7 +197,7 @@ export async function main(ns) {
 
 
     await ns.sleep(0);
-    await ns.sleep(200)
+    await ns.sleep(400)
   }
 }
 
