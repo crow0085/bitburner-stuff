@@ -196,7 +196,6 @@ export async function main(ns) {
         }
       }
       if (performance.now() > sleepWhen) {
-        ns.print(`sleeping`)
         sleepWhen = performance.now() + fpsSensitivityMs;
       }
     }
