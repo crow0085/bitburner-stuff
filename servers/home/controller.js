@@ -63,8 +63,6 @@ export async function main(ns) {
       }
 
     }
-
-
     await ns.sleep(delay + 50);
   }
 
@@ -90,13 +88,12 @@ export async function main(ns) {
     servers.sort((a, b) => a.isHome - b.isHome);
 
     // start batching hwgw
-    
+
     const batchSize = 5000;
-    const maxBatchCount = 80000 * 4;
-    
-    
-    let nextSleep = performance.now() + 400
-    
+    const maxBatchCount = 65000 * 4;
+
+    let nextSleep = performance.now() + 600
+
     for (let i = 0; i < batchSize; i++) {
       const hPercent = ns.hackAnalyze(target.hostname);
       const amount = target.maxMoney * greed;
@@ -178,10 +175,10 @@ export async function main(ns) {
           //ns.print(nextBatch)
           for (let cmd of nextBatch) {
             //ns.tprint(`executing command ${cmd.filename} from ${cmd.attacker} hitting server ${target.hostname}`)
-            pids.push(ns.exec(cmd.filename, cmd.attacker, cmd.threads, target.hostname, cmd.landing, cmd.runtime))                  
+            pids.push(ns.exec(cmd.filename, cmd.attacker, cmd.threads, target.hostname, cmd.landing, cmd.runtime))
           }
 
-          batchCount ++;   
+          batchCount++;
 
           const allRunning = pids.filter(p => p > 0).length == 4 ? true : false
           if (!allRunning) {
@@ -189,22 +186,27 @@ export async function main(ns) {
             ns.exit();
           }
 
-          if (batchCount == maxBatchCount){
+          if (batchCount == maxBatchCount) {
             batchCount = 0;
             greed += 0.05;
             greed = greed > 0.95 ? 0.95 : greed;
-            ns.print(greed);
-            await ns.sleep(target.weakenTime);
-            break;           
+            ns.print(`new greed: ${greed}`);
+            await ns.sleep(target.weakenTime + 80);
+            break;
           }
         }
       }
-      if(performance.now() > nextSleep){
+      if (home.freeRam < growThreads * growRamCost){
+        greed -= 0.01;
+        greed = greed < 0.01 ? 0.01 : greed;
+        ns.print(`new greed: ${greed}`);
+      } 
+      if (performance.now() > nextSleep) {
         await ns.sleep(0)
-        nextSleep = performance.now() + 400
+        nextSleep = performance.now() + 600
       }
-    }
-    await ns.sleep(0)
+    }       
+    await ns.sleep(50)
   }
 }
 
