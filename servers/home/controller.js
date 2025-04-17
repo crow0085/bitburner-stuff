@@ -83,7 +83,7 @@ export async function main(ns) {
   let greed = 0.05;
 
   let activeBatches = 0; // Track the number of active batches
-  const maxBatches = 100000; // Maximum allowed batches | could maybe make bigger but very likely to black screen from hitting 4gb ram cap
+  const maxBatches = 200000; // Maximum allowed batches | could maybe make bigger but very likely to black screen from hitting 4gb ram cap
 
   while (true) {
     let servers = getServers(ns);
@@ -100,7 +100,8 @@ export async function main(ns) {
         break;
       }
 
-      if (target.currentMoney != target.maxMoney){
+      //if (target.currentMoney != target.maxMoney){
+      if (!target.isPrepped){
         await ns.sleep(0)
         break;
       }
