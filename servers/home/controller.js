@@ -80,22 +80,31 @@ export async function main(ns) {
 
   await ns.sleep(1000);
   ns.print(`Ready to start firing batches on all available servers targetting: ${target.hostname}`)
-  let batchCount = 0;
   let greed = 0.05;
+
+  let activeBatches = 0; // Track the number of active batches
+  const maxBatches = 300000; // Maximum allowed batches
 
   while (true) {
     let servers = getServers(ns);
     servers.sort((a, b) => a.isHome - b.isHome);
 
-    // start batching hwgw
-
-    const batchSize = 5000;
-    const maxBatchCount = 60000 * 4;
-
-    let nextSleep = performance.now() + 400
+    const batchSize = 1000;
+    const fpsSensitivityMs = 300;
+    let sleepWhen = performance.now() + fpsSensitivityMs;    
 
     for (let i = 0; i < batchSize; i++) {
-      
+
+      if (activeBatches >= maxBatches) {
+        await ns.sleep(0);
+        break;
+      }
+
+      if (target.currentMoney != target.maxMoney){
+        await ns.sleep(0)
+        continue;
+      }
+
       const hPercent = ns.hackAnalyze(target.hostname);
       const amount = target.maxMoney * greed;
       const hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target.hostname, amount)), 1);
@@ -116,19 +125,7 @@ export async function main(ns) {
         wk2: weakThreads2
       };
 
-      //ns.print(proposedBatch)
-
       for (let server of servers) {
-        if (nextBatch.length == 4)
-          break;
-
-        if (home.freeRam < growThreads * growRamCost){
-          greed -= 0.01;
-          greed = greed < 0.01 ? 0.01 : greed;
-          ns.print(`new greed: ${greed}`);
-          break;
-        } 
-
         let ram = server.freeRam;
 
         if (proposedBatch.hk > 0 && ram > proposedBatch.hk * hackRamCost) {
@@ -148,7 +145,7 @@ export async function main(ns) {
             attacker: server.hostname,
             filename: '/batching/wk.js',
             threads: proposedBatch.wk,
-            landing: nextLanding + 20,
+            landing: nextLanding + 100,
             runtime: 4 * ns.getHackTime(target.hostname)
           });
           ram -= proposedBatch.wk * weakRamCost;
@@ -160,7 +157,7 @@ export async function main(ns) {
             attacker: server.hostname,
             filename: '/batching/gr.js',
             threads: proposedBatch.gr,
-            landing: nextLanding + 40,
+            landing: nextLanding + 200,
             runtime: 3.2 * ns.getHackTime(target.hostname)
           });
           ram -= proposedBatch.gr * growRamCost;
@@ -172,7 +169,7 @@ export async function main(ns) {
             attacker: server.hostname,
             filename: '/batching/wk.js',
             threads: proposedBatch.wk2,
-            landing: nextLanding + 60,
+            landing: nextLanding + 300,
             runtime: 4 * ns.getHackTime(target.hostname)
           });
           proposedBatch.wk2 = 0;
@@ -180,49 +177,38 @@ export async function main(ns) {
 
         const pids = [];
         if (nextBatch.length == 4) {
-          //ns.print(nextBatch)
+          const p = ns.hackAnalyze(target.hostname)
+          const t = p * nextBatch[0].threads
+          ns.print(`greed: ${greed} | hackanalyze: ${p} * hackthreads: ${nextBatch[0].threads} = ${ns.formatNumber(t)}`)
+
           for (let cmd of nextBatch) {
-            //ns.tprint(`executing command ${cmd.filename} from ${cmd.attacker} hitting server ${target.hostname}`)
-            pids.push(ns.exec(cmd.filename, cmd.attacker, cmd.threads, target.hostname, cmd.landing, cmd.runtime))
+            const pid = ns.exec(cmd.filename, cmd.attacker, cmd.threads, target.hostname, cmd.landing, cmd.runtime);
+            pids.push(pid);
           }
 
-          batchCount++;
-
-          const allRunning = pids.filter(p => p > 0).length == 4 ? true : false
-          if (!allRunning) {
-            ns.alert(`Something happened and didnt return 4 pids so memory alloc failed`);
+          const allRunning = pids.filter(p => p > 0).length == 4;
+          if (allRunning) {
+            activeBatches++; // Increment active batch count 
+            if (activeBatches >= maxBatches) {
+              greed = greed + 0.05 > 0.95 ? 0.95 : greed + 0.05
+            }
+            // Decrement active batch count after the batch completes
+            setTimeout(() => {
+              activeBatches--; // Decrement active batch count
+            }, nextBatch[3].landing - performance.now());
+          } else {
+            ns.alert(`Something happened and didn't return 4 pids, so memory alloc failed`);
             ns.exit();
           }
-
-          if (batchCount == maxBatchCount) {
-            batchCount = 0;
-            greed += 0.05;
-            greed = greed > 0.95 ? 0.95 : greed;
-            ns.print(`new greed: ${greed}`);
-            await ns.sleep(nextLanding - performance.now() + 500);
-            for (let s of ns.getPurchasedServers()){
-              ns.killall(s)
-            }
-            ns.scriptKill('/batching/hk.js', server.hostname);
-            ns.scriptKill('/batching/gr.js', server.hostname);
-            ns.scriptKill('/batching/wk.js', server.hostname);
-            await ns.sleep(0);
-            break;
-          }
+          break;
         }
       }
-      
-      const fps = parseFloat(ns.read('fps.txt'));
-      if (fps < 5){
-        await(ns.sleep(50));
-      }  
-          
-      // if (performance.now() > nextSleep) {
-      //   await ns.sleep(0)
-      //   nextSleep = performance.now() + 400
-      // }
-    }       
-    await ns.sleep(0)
+      if (performance.now() > sleepWhen) {
+        await ns.asleep(0);
+        sleepWhen = performance.now() + fpsSensitivityMs;
+      }
+    }
+    await ns.sleep(0);
   }
 }
 

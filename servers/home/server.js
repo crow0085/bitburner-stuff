@@ -33,6 +33,9 @@ export default class CustomServer {
     else
       return this.ns.getServerMaxRam(this.hostname);
   }
+  get trueMaxRam(){
+    return this.ns.getServerMaxRam(this.hostname)
+  }
   get freeRam() { return this.maxRam - this.usedRam }
   threadCount(scriptRam) {
     let threads = 0;
