@@ -1,10 +1,11 @@
+
 /** @param {NS} ns */
 export async function main(ns) {
     ns.ui.openTail()
     ns.disableLog('ALL')
     ns.clearLog()
 
-    const target = "joesguns";
+    const target = "n00dles";
 
     const moneyThresh = ns.getServerMaxMoney(target);
 
@@ -13,7 +14,6 @@ export async function main(ns) {
     ns.print(`Attacking: ${target}`)
     while(true) {
         if (ns.getServerSecurityLevel(target) > securityThresh) {
-            ns.print('running weak')
             await ns.weaken(target);
         } else if (ns.getServerMoneyAvailable(target) < moneyThresh) {
             ns.print('running grow')
