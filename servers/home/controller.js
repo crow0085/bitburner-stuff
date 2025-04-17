@@ -95,6 +95,7 @@ export async function main(ns) {
     let nextSleep = performance.now() + 400
 
     for (let i = 0; i < batchSize; i++) {
+      
       const hPercent = ns.hackAnalyze(target.hostname);
       const amount = target.maxMoney * greed;
       const hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target.hostname, amount)), 1);
@@ -199,14 +200,27 @@ export async function main(ns) {
             greed = greed > 0.95 ? 0.95 : greed;
             ns.print(`new greed: ${greed}`);
             await ns.sleep(nextLanding - performance.now() + 500);
+            for (let s of ns.getPurchasedServers()){
+              ns.killall(s)
+            }
+            ns.scriptKill('/batching/hk.js', server.hostname);
+            ns.scriptKill('/batching/gr.js', server.hostname);
+            ns.scriptKill('/batching/wk.js', server.hostname);
+            await ns.sleep(0);
             break;
           }
         }
-      }      
-      if (performance.now() > nextSleep) {
-        await ns.sleep(0)
-        nextSleep = performance.now() + 400
       }
+      
+      const fps = parseFloat(ns.read('fps.txt'));
+      if (fps < 5){
+        await(ns.sleep(50));
+      }  
+          
+      // if (performance.now() > nextSleep) {
+      //   await ns.sleep(0)
+      //   nextSleep = performance.now() + 400
+      // }
     }       
     await ns.sleep(0)
   }

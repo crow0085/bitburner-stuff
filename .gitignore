@@ -142,3 +142,4 @@ build/
 
 fps-stats.d.ts
 servers/home/showfps.tsx
+servers/home/test.js
