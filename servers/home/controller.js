@@ -83,7 +83,7 @@ export async function main(ns) {
   let greed = 0.05;
 
   let activeBatches = 0; // Track the number of active batches
-  const maxBatches = 250000; // Maximum allowed batches
+  const maxBatches = 100000; // Maximum allowed batches
 
   while (true) {
     let servers = getServers(ns);
