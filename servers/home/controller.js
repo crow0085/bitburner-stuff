@@ -83,7 +83,7 @@ export async function main(ns) {
   let greed = 0.05;
 
   let activeBatches = 0; // Track the number of active batches
-  const maxBatches = 300000; // Maximum allowed batches
+  const maxBatches = 250000; // Maximum allowed batches
 
   while (true) {
     let servers = getServers(ns);
@@ -102,7 +102,7 @@ export async function main(ns) {
 
       if (target.currentMoney != target.maxMoney){
         await ns.sleep(0)
-        continue;
+        break;
       }
 
       const hPercent = ns.hackAnalyze(target.hostname);
