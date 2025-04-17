@@ -35,6 +35,6 @@ export async function main(ns) {
     }
 
     ns.write(fileName, JSON.stringify(jsonObj), 'w');
-    await ns.sleep(0);
+    await ns.sleep(50);
   }
 }

@@ -179,7 +179,7 @@ export async function main(ns) {
         if (nextBatch.length == 4) {
           const p = ns.hackAnalyze(target.hostname)
           const t = p * nextBatch[0].threads
-          ns.print(`greed: ${greed} | hackanalyze: ${p} * hackthreads: ${nextBatch[0].threads} = ${ns.formatNumber(t)}`)
+          //ns.print(`greed: ${greed} | hackanalyze: ${p} * hackthreads: ${nextBatch[0].threads} = ${ns.formatNumber(t)}`)
 
           for (let cmd of nextBatch) {
             const pid = ns.exec(cmd.filename, cmd.attacker, cmd.threads, target.hostname, cmd.landing, cmd.runtime);

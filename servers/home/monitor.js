@@ -2,7 +2,7 @@ import CustomServer from './server.js';
 
 /** @param {NS} ns */
 export async function main(ns) {
-  const delay = 0;
+  const delay = 50;
   const file = 'target.txt'
 
 
