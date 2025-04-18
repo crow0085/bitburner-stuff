@@ -114,8 +114,8 @@ export async function main(ns) {
       let hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target.hostname, target.maxMoney * greed)), 1);
       let weakThreads1 = Math.ceil(hackThreads / 25);
       let percentH = 1 / (1 - (ns.hackAnalyze(target.hostname) * hackThreads));
-      let growThreads = Math.ceil(ns.growthAnalyze(target.hostname, percentH));
-      let weakThreads2 = Math.ceil(growThreads / 12);
+      let growThreads = Math.max(Math.ceil(ns.growthAnalyze(target.hostname, percentH)), 1);
+      let weakThreads2 = Math.max(Math.ceil(growThreads / 12), 1);
 
       let nextBatch = [];
       let proposedBatch = {
