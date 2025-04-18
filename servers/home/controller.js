@@ -94,13 +94,14 @@ export async function main(ns) {
     let sleepWhen = performance.now() + fpsSensitivityMs;    
 
     let padding = 5000;
-    let nextLanding = target.weakenTime + performance.now() + padding;
+    
 
     for (let i = 0; i < batchSize; i++) {
       if (activeBatches >= maxBatches) {
-        await ns.sleep(0);
+        await ns.sleep(target.weakenTime + padding + 5000);
         break;
       }
+      let nextLanding = target.weakenTime + performance.now() + padding;
 
       // const hPercent = ns.hackAnalyze(target.hostname);
       // const amount = target.maxMoney * greed;
@@ -185,7 +186,6 @@ export async function main(ns) {
           const allRunning = pids.filter(p => p > 0).length == 4;
           if (allRunning) {
             activeBatches++;
-            nextLanding += 50; // Increment landing time for the next batch
             if (activeBatches >= maxBatches) {
               greed = greed + 0.05 > 0.95 ? 0.95 : greed + 0.05;
             }
