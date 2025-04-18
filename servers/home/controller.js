@@ -90,7 +90,7 @@ export async function main(ns) {
     servers.sort((a, b) => a.isHome - b.isHome);
 
     const batchSize = maxBatches;
-    const fpsSensitivityMs = 300;
+    const fpsSensitivityMs = 200;
     let sleepWhen = performance.now() + fpsSensitivityMs;    
 
     let padding = 5000;
@@ -102,9 +102,9 @@ export async function main(ns) {
     let weakThreads2 = Math.max(Math.ceil(growThreads / 12), 1);
     
 
-    for (let i = 0; i < batchSize; i++) {
+    for (let i = 0; i <= batchSize; i++) {
       if (activeBatches >= maxBatches) {
-        await ns.sleep(target.weakenTime + padding + 1000);
+        await ns.sleep(1000);
         break;
       }
       let nextLanding = target.weakenTime + performance.now() + padding;      
