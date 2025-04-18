@@ -117,8 +117,7 @@ export async function main(ns) {
         gr: growThreads,
         wk2: weakThreads2
       };
-
-      servers = [new CustomServer(ns, 'home')];
+      
       for (let server of servers) {
         let ram = server.freeRam;
 
