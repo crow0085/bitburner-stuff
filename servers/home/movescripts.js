@@ -1,13 +1,18 @@
 /** @param {NS} ns */
 export async function main(ns) {
-    ns.scp('/dashboard.js', 'pserv-0');
-    ns.scp('/find_target.js', 'pserv-0');
-    ns.scp('/gen_server_data.js', 'pserv-0');
-    ns.scp('/controller.js', 'pserv-0');
-    ns.scp('/weak.js', 'pserv-0');
-    ns.scp('/grow.js', 'pserv-0');
-    ns.scp('/hack.js', 'pserv-0');
-    ns.scp('/batching/hk.js', 'pserv-0');
-    ns.scp('/batching/gr.js', 'pserv-0');
-    ns.scp('/batching/wk.js', 'pserv-0');
+    const host = ns.args[0]
+    ns.scp('/dashboard.js', host);
+    ns.scp('/find_target.js', host);
+    ns.scp('/gen_server_data.js', host);
+    ns.scp('/controller.js', host);
+    ns.scp('/weak.js', host);
+    ns.scp('/grow.js', host);
+    ns.scp('/hack.js', host);
+    ns.scp('/batching/hk.js', host);
+    ns.scp('/batching/gr.js', host);
+    ns.scp('/batching/wk.js', host);
+}
+
+export function autocomplete(data, args) {
+    return data.servers;
 }

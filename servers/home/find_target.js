@@ -4,7 +4,7 @@ import * as utils from './utils.js';
 /** @param {NS} ns */
 export async function main(ns) {
     while (true) {
-        let target =  getTarget(ns)
+        let target = getTarget(ns)
         if (ns.getPlayer().skills.hacking < 100){
             ns.write('target.txt', 'n00dles', 'w');
         }else{
@@ -16,7 +16,7 @@ export async function main(ns) {
 }
 
 /** 
- * @param {NS} ns 
+ * @param {NS} ns
  * */
 function getTarget(ns) {
     let slist = utils.netscan(ns);

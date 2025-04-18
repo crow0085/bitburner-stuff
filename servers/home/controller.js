@@ -89,20 +89,16 @@ export async function main(ns) {
     let servers = getServers(ns);
     servers.sort((a, b) => a.isHome - b.isHome);
 
-    const batchSize = 1000;
+    const batchSize = maxBatches;
     const fpsSensitivityMs = 300;
     let sleepWhen = performance.now() + fpsSensitivityMs;    
 
-    for (let i = 0; i < batchSize; i++) {
+    let padding = 5000;
+    let nextLanding = target.weakenTime + performance.now() + padding;
 
+    for (let i = 0; i < batchSize; i++) {
       if (activeBatches >= maxBatches) {
         await ns.sleep(0);
-        break;
-      }
-
-      //if (target.currentMoney != target.maxMoney){
-      if (!target.isPrepped){
-        await ns.sleep(0)
         break;
       }
 
@@ -114,11 +110,7 @@ export async function main(ns) {
       const weakThreads1 = Math.max(Math.ceil(hackThreads * 0.002 / 0.05), 1);
       const weakThreads2 = Math.max(Math.ceil(hackThreads * 0.004 / 0.05), 1);
 
-      let currentTime = performance.now();
-      let nextLanding = target.weakenTime + currentTime + 5000;
-
       let nextBatch = [];
-
       let proposedBatch = {
         hk: hackThreads,
         wk: weakThreads1,
@@ -126,6 +118,7 @@ export async function main(ns) {
         wk2: weakThreads2
       };
 
+      servers = [new CustomServer(ns, 'home')];
       for (let server of servers) {
         let ram = server.freeRam;
 
@@ -146,7 +139,7 @@ export async function main(ns) {
             attacker: server.hostname,
             filename: '/batching/wk.js',
             threads: proposedBatch.wk,
-            landing: nextLanding + 100,
+            landing: nextLanding + 50,
             runtime: 4 * ns.getHackTime(target.hostname)
           });
           ram -= proposedBatch.wk * weakRamCost;
@@ -158,7 +151,7 @@ export async function main(ns) {
             attacker: server.hostname,
             filename: '/batching/gr.js',
             threads: proposedBatch.gr,
-            landing: nextLanding + 200,
+            landing: nextLanding + 100,
             runtime: 3.2 * ns.getHackTime(target.hostname)
           });
           ram -= proposedBatch.gr * growRamCost;
@@ -170,7 +163,7 @@ export async function main(ns) {
             attacker: server.hostname,
             filename: '/batching/wk.js',
             threads: proposedBatch.wk2,
-            landing: nextLanding + 300,
+            landing: nextLanding + 150,
             runtime: 4 * ns.getHackTime(target.hostname)
           });
           proposedBatch.wk2 = 0;
@@ -178,24 +171,21 @@ export async function main(ns) {
 
         const pids = [];
         if (nextBatch.length == 4) {
-          const p = ns.hackAnalyze(target.hostname)
-          const t = p * nextBatch[0].threads
-          //ns.print(`greed: ${greed} | hackanalyze: ${p} * hackthreads: ${nextBatch[0].threads} = ${ns.formatNumber(t)}`)
-
+          ns.print(`Batch ${activeBatches}: nextBatch = ${JSON.stringify(nextBatch)}`);
           for (let cmd of nextBatch) {
-            const pid = ns.exec(cmd.filename, cmd.attacker, cmd.threads, target.hostname, cmd.landing, cmd.runtime);
+            const pid = ns.exec(cmd.filename, cmd.attacker, cmd.threads, target.hostname, cmd.landing, cmd.runtime, activeBatches);
             pids.push(pid);
           }
 
           const allRunning = pids.filter(p => p > 0).length == 4;
           if (allRunning) {
-            activeBatches++; // Increment active batch count 
+            activeBatches++;
+            nextLanding += 200; // Increment landing time for the next batch
             if (activeBatches >= maxBatches) {
-              greed = greed + 0.05 > 0.95 ? 0.95 : greed + 0.05
+              greed = greed + 0.05 > 0.95 ? 0.95 : greed + 0.05;
             }
-            // Decrement active batch count after the batch completes
             setTimeout(() => {
-              activeBatches--; // Decrement active batch count
+              activeBatches--;
             }, nextBatch[3].landing - performance.now());
           } else {
             ns.alert(`Something happened and didn't return 4 pids, so memory alloc failed`);
@@ -208,7 +198,7 @@ export async function main(ns) {
         await ns.asleep(0);
         sleepWhen = performance.now() + fpsSensitivityMs;
       }
-    }
+    }    
     await ns.sleep(0);
   }
 }
