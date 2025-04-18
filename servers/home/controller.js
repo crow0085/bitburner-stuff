@@ -98,7 +98,7 @@ export async function main(ns) {
 
     for (let i = 0; i < batchSize; i++) {
       if (activeBatches >= maxBatches) {
-        await ns.sleep(target.weakenTime + padding + 5000);
+        await ns.sleep(target.weakenTime + padding + 1000);
         break;
       }
       let nextLanding = target.weakenTime + performance.now() + padding;
