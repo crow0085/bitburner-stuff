@@ -102,13 +102,21 @@ export async function main(ns) {
         break;
       }
 
+      //const hPercent = ns.hackAnalyze(target.hostname);
+      //const amount = target.maxMoney * greed;
+      //const hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target.hostname, amount)), 1);
+      //const tGreed = hPercent * hackThreads;
+      //const growThreads = Math.ceil(ns.growthAnalyze(target.hostname, target.maxMoney / (target.maxMoney - target.maxMoney * tGreed)) * 1.02);
+      //const weakThreads1 = Math.max(Math.ceil(hackThreads * 0.002 / 0.05), 1);
+      //const weakThreads2 = Math.max(Math.ceil(hackThreads * 0.004 / 0.05), 1);
+
       const hPercent = ns.hackAnalyze(target.hostname);
       const amount = target.maxMoney * greed;
       const hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target.hostname, amount)), 1);
       const tGreed = hPercent * hackThreads;
+      const weakThreads1 = Math.max(Math.ceil(hackThreads / 25), 1);
       const growThreads = Math.ceil(ns.growthAnalyze(target.hostname, target.maxMoney / (target.maxMoney - target.maxMoney * tGreed)) * 1.02);
-      const weakThreads1 = Math.max(Math.ceil(hackThreads * 0.002 / 0.05), 1);
-      const weakThreads2 = Math.max(Math.ceil(hackThreads * 0.004 / 0.05), 1);
+      const weakThreads2 = Math.max(Math.ceil(growThreads / 12), 1);
 
       let nextBatch = [];
       let proposedBatch = {
@@ -117,7 +125,7 @@ export async function main(ns) {
         gr: growThreads,
         wk2: weakThreads2
       };
-      
+
       for (let server of servers) {
         let ram = server.freeRam;
 
