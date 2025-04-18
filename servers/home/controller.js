@@ -102,21 +102,21 @@ export async function main(ns) {
         break;
       }
 
-      //const hPercent = ns.hackAnalyze(target.hostname);
-      //const amount = target.maxMoney * greed;
-      //const hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target.hostname, amount)), 1);
-      //const tGreed = hPercent * hackThreads;
-      //const growThreads = Math.ceil(ns.growthAnalyze(target.hostname, target.maxMoney / (target.maxMoney - target.maxMoney * tGreed)) * 1.02);
-      //const weakThreads1 = Math.max(Math.ceil(hackThreads * 0.002 / 0.05), 1);
-      //const weakThreads2 = Math.max(Math.ceil(hackThreads * 0.004 / 0.05), 1);
-
       const hPercent = ns.hackAnalyze(target.hostname);
       const amount = target.maxMoney * greed;
       const hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target.hostname, amount)), 1);
       const tGreed = hPercent * hackThreads;
-      const weakThreads1 = Math.max(Math.ceil(hackThreads / 25), 1);
       const growThreads = Math.ceil(ns.growthAnalyze(target.hostname, target.maxMoney / (target.maxMoney - target.maxMoney * tGreed)) * 1.02);
-      const weakThreads2 = Math.max(Math.ceil(growThreads / 12), 1);
+      const weakThreads1 = Math.max(Math.ceil(hackThreads * 0.002 / 0.05), 1);
+      const weakThreads2 = Math.max(Math.ceil(hackThreads * 0.004 / 0.05), 1);
+
+      // const hPercent = ns.hackAnalyze(target.hostname);
+      // const amount = target.maxMoney * greed;
+      // const hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target.hostname, amount)), 1);
+      // const tGreed = hPercent * hackThreads;
+      // const weakThreads1 = Math.max(Math.ceil(hackThreads / 25), 1);
+      // const growThreads = Math.ceil(ns.growthAnalyze(target.hostname, target.maxMoney / (target.maxMoney - target.maxMoney * tGreed)) * 1.02);
+      // const weakThreads2 = Math.max(Math.ceil(growThreads / 12), 1);
 
       let nextBatch = [];
       let proposedBatch = {
@@ -178,7 +178,7 @@ export async function main(ns) {
 
         const pids = [];
         if (nextBatch.length == 4) {
-          ns.print(`Batch ${activeBatches}: nextBatch = ${JSON.stringify(nextBatch)}`);
+          ns.print(`Batch ${activeBatches}: Greed = ${greed} : nextBatch = ${JSON.stringify(nextBatch)}`);
           for (let cmd of nextBatch) {
             const pid = ns.exec(cmd.filename, cmd.attacker, cmd.threads, target.hostname, cmd.landing, cmd.runtime, activeBatches);
             pids.push(pid);
@@ -187,7 +187,7 @@ export async function main(ns) {
           const allRunning = pids.filter(p => p > 0).length == 4;
           if (allRunning) {
             activeBatches++;
-            nextLanding += 200; // Increment landing time for the next batch
+            nextLanding += 50; // Increment landing time for the next batch
             if (activeBatches >= maxBatches) {
               greed = greed + 0.05 > 0.95 ? 0.95 : greed + 0.05;
             }
