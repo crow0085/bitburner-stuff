@@ -44,9 +44,9 @@ export default class CustomServer {
   }
   get isPrepped() {
     let prepped = false;
-    let hasMaxMoney = this.currentMoney == this.maxMoney ? true : false;
-    let isMinSecurity = this.currentSecurity == this.minSecurity ? true : false;
-    prepped = hasMaxMoney == true && isMinSecurity == true ? true : false;
+    let hasMaxMoney = this.currentMoney === this.maxMoney ? true : false;
+    let isMinSecurity = this.currentSecurity === this.minSecurity ? true : false;
+    prepped = hasMaxMoney === true && isMinSecurity === true ? true : false;
 
     return prepped;
   }

@@ -13,7 +13,7 @@ export async function main(ns) {
 
     for (let h of hosts) {
         const host = new CustomServer(ns, h)
-        const threads = host.threadCount(max) / 2
+        const threads = Math.floor(host.threadCount(max) / 2)
         ns.exec('grow.js', host.hostname, threads, target.hostname, true)
         ns.exec('weak.js', host.hostname, threads, target.hostname, true)
         await ns.sleep(0)

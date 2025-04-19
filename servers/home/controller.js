@@ -27,7 +27,7 @@ export async function main(ns) {
 
   ns.print(`prepping: ${target.hostname}`);
   // prep target
-  while (!target.isPrepped) {
+  while (target.currentMoney != target.maxMoney && target.currentSecurity != target.minSecurity) {
 
     let servers = getServers(ns);
     await ns.sleep(50);
@@ -48,6 +48,7 @@ export async function main(ns) {
         ns.exec('weak.js', home.hostname, weakThreads2, target.hostname);
       delay = target.weakenTime;
     }
+
     else {
       for (let server of servers) {
         if (weakThreads1 > 0 && server.threadCount(weakRamCost) > 0) {
@@ -99,14 +100,14 @@ export async function main(ns) {
     let weakThreads1 = Math.ceil(hackThreads / 25);
     let percentH = 1 / (1 - (ns.hackAnalyze(target.hostname) * hackThreads));
     let growThreads = Math.max(Math.ceil(ns.growthAnalyze(target.hostname, percentH) * 1.02) , 1);
-    let weakThreads2 = Math.max(Math.ceil(growThreads / 12), 1);
-    
+    let weakThreads2 = Math.max(Math.ceil(growThreads / 12), 1);   
 
     for (let i = 0; i <= batchSize; i++) {
       if (activeBatches >= maxBatches) {
         await ns.sleep(1000);
         break;
       }
+      if (target.currentMoney != target.maxMoney && target.currentSecurity != target.minSecurity) {await ns.sleep(0); continue;}
       let nextLanding = target.weakenTime + performance.now() + padding;      
 
       let nextBatch = [];
