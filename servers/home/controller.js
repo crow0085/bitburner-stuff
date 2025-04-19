@@ -27,7 +27,8 @@ export async function main(ns) {
 
   ns.print(`prepping: ${target.hostname}`);
   // prep target
-  while (target.currentMoney != target.maxMoney && target.currentSecurity != target.minSecurity) {
+
+  while (!target.isPrepped) {
 
     let servers = getServers(ns);
     await ns.sleep(50);
@@ -107,7 +108,7 @@ export async function main(ns) {
         await ns.sleep(1000);
         break;
       }
-      if (target.currentMoney != target.maxMoney && target.currentSecurity != target.minSecurity) {await ns.sleep(0); continue;}
+      if (target.minSecurity != target.currentSecurity) {await ns.sleep(0); continue;}
       let nextLanding = target.weakenTime + performance.now() + padding;      
 
       let nextBatch = [];
