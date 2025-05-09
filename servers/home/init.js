@@ -8,8 +8,6 @@ export async function main(ns) {
     await ns.sleep(200);
     ns.exec('buy_servers.js', 'home');
     await ns.sleep(200);
-    //ns.exec('hacknet.js', 'home');
-    //await ns.sleep(200);
     ns.exec('controller.js', 'home');
     await ns.sleep(200);
     ns.exec('dashboard.js', 'home');

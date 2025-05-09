@@ -82,7 +82,7 @@ export async function main(ns) {
 
   await ns.sleep(1000);
   ns.print(`Ready to start firing batches on all available servers targetting: ${target.hostname}`)
-  let greed = 0.05;
+  let greed = 0.01;
 
   let activeBatches = 0; // Track the number of active batches
   const maxBatches = 200000; // Maximum allowed batches | could maybe make bigger but very likely to black screen from hitting 4gb ram cap
@@ -100,7 +100,7 @@ export async function main(ns) {
     let hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target.hostname, target.maxMoney * greed)), 1);
     let weakThreads1 = Math.ceil(hackThreads / 25);
     let percentH = 1 / (1 - (ns.hackAnalyze(target.hostname) * hackThreads));
-    let growThreads = Math.max(Math.ceil(ns.growthAnalyze(target.hostname, percentH) * 1.02) , 1);
+    let growThreads = Math.max(Math.ceil(ns.growthAnalyze(target.hostname, percentH) * 1.25) , 1);
     let weakThreads2 = Math.max(Math.ceil(growThreads / 12), 1);   
 
     for (let i = 0; i <= batchSize; i++) {
@@ -108,7 +108,11 @@ export async function main(ns) {
         await ns.sleep(1000);
         break;
       }
-      if (target.minSecurity != target.currentSecurity) {await ns.sleep(0); continue;}
+      if (target.minSecurity != target.currentSecurity) {        
+        await ns.sleep(0); 
+        continue;
+      }
+
       let nextLanding = target.weakenTime + performance.now() + padding;      
 
       let nextBatch = [];

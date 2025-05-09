@@ -1,10 +1,10 @@
 import CustomServer from "./server";
-const UPGRADE_DELAY = 60;
+const UPGRADE_DELAY = 120;
 
 /** @param {NS} ns */
 export async function main(ns) {
   let power2 = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576];
-  const ram = power2[8];
+  const ram = power2[6];
   const purchaseDelay = 5;
   let i = ns.getPurchasedServers().length;
 
